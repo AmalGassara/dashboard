@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<body>
+<div id="container" hx-get="{% url 'map-view' %}" hx-trigger="every 10s" hx-swap="outerHTML" >
+    {% include 'map.html' %}
+</div>
+<script src="https://unpkg.com/htmx.org@1.6.1"></script>
+</body>
+
+</html>

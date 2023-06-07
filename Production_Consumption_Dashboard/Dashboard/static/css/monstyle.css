@@ -1,0 +1,95 @@
+/*Sometimes all it takes is just "Ctrl + F5"*/
+
+.leaflet-popup-content {
+    background-color: #fff;
+    padding: 10px;
+    font-size: 14px;
+}
+.leaflet-tooltip {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 5px;
+    font-size: 12px;
+}
+.leaflet-container {
+    font-family: Arial, sans-serif;
+    color: #333;
+
+}
+.aside-style{
+    width: 26%;
+    position: fixed;
+    top: 0; right: 0;
+}
+.aside-div{
+
+    background-color: #F9F6F6;
+    font-size: 20px;
+    border: 3px #B3B0B0 solid; border-radius: 5px;
+    margin: 5px;
+    padding: 5px;
+}
+.section-style{
+    width: 73%;
+    position: fixed;
+    height: 100%; top: 0; left: 0;
+    border: 3px #B3B0B0 solid;border-radius: 5px;
+    margin: 5px;
+}
+
+.button-style {
+  margin: 10px;
+  padding: 15px 30px;
+  text-align: center;
+  text-transform: uppercase;
+  transition: 0.5s;
+  background-size: 200% auto;
+  color: white;
+  border-radius: 10px;
+  display: block;
+  border: 0px;
+  font-weight: 700;
+  box-shadow: 0px 0px 14px -7px #f09819;
+  background-image: linear-gradient(45deg, #FF512F 0%, #F09819  51%, #FF512F  100%);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.button-style:hover {
+  background-position: right center;
+  /* change the direction of the change here */
+  color: #fff;
+  text-decoration: none;
+}
+
+.button-style:active {
+  transform: scale(0.95);
+}
+
+.tooltip-marker-production{
+    /*background-color: #ffe54c;*/
+    /*background-color: #28BB57;*/
+    background-color: black;
+    color: #F09819;
+    font-size:16px;
+}
+.tooltip-marker-consumption{
+    /*background-color: #F09819;
+    background-color: #0078d0;*/
+    background-color: black;
+    color: #F09819;
+    font-size:16px;
+}
+.tooltip-path-begin{
+      box-shadow: 0px 0px 14px -7px #f09819;
+      background-image: linear-gradient(45deg, #FF512F 0%, #F09819  51%, #FF512F  100%);
+    font-size:14px;
+}
+
+.tooltip-path-end{
+  background: #ad5389;
+  background: linear-gradient(0deg, rgba(20,167,62,1) 0%, rgba(102,247,113,1) 100%);
+    font-size:14px;
+}

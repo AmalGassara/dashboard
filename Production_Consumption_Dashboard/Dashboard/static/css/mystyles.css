@@ -1,0 +1,16 @@
+
+.leaflet-popup-content {
+    background-color: #fff;
+    padding: 10px;
+    font-size: 14px;
+}
+.leaflet-tooltip {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 5px;
+    font-size: 12px;
+}
+.leaflet-container {
+    font-family: Arial, sans-serif;
+    color: #333;
+}

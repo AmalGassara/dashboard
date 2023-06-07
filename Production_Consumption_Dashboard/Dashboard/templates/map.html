@@ -1,0 +1,286 @@
+<!DOCTYPE html><!-- Include the Leaflet CSS and JS files -->
+<html xmlns="http://www.w3.org/1999/html">
+{% load static %}
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+   crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+   crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet-ant-path" type="text/javascript"></script>
+    <script src="https://unpkg.com/leaflet.curve" type="text/javascript"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!--<link rel="stylesheet" type="text/css" href="{% static 'css/mystyles.css' %}">-->
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/monstyle.css' %}">
+    <script>
+    var map;
+    var marker_crns, marker_M1, marker_M2;
+    var crns,M1, M2;
+    var arr = { "crns" : [{{markers.0.lat }}, {{markers.0.lng }}], "M1" : [{{markers.1.lat }}, {{markers.1.lng }}], "M2": [{{markers.2.lat }}, {{markers.2.lng }}] };
+    var pathGroup = L.layerGroup();
+    var polylineGroup = L.layerGroup();
+    var tooltipGroup = L.layerGroup();
+    function map(){
+    // Create the map
+    map = L.map('map').setView([{{ coordinates.0 }}, {{ coordinates.1 }}], 16.3);
+
+    // Add a tile layer
+    L.tileLayer('http://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', attr='&copy; Openstreetmap France | &copy; ODbL', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+        maxZoom: 18
+    }).addTo(map);
+
+    // Add Markers
+    var markerGroup = L.layerGroup().addTo(map);
+
+    //{% for marker in markers %}
+    //var marker = L.marker([{{ marker.lat }}, {{ marker.lng }}]).addTo(markerGroup);
+    //marker.bindTooltip("<b><h3>{{ marker.description }} <br><h3>{{ marker.description2 }}</b><br><img src='{{ marker.img_url }}' width='200' height='120'>", {permanent: true, direction: 'right', background-color:white}).openTooltip();
+    //marker.bindTooltip("<b>{{ marker.description }}</b></br><img src='{{ marker.img_url }}' width='80' height='60'>", {permanent: true, direction: 'right'}).openTooltip();
+    //{% endfor %}
+    crns= [{{markers.0.lat }}, {{markers.0.lng }}];
+    M1= [{{markers.1.lat }}, {{markers.1.lng }}];
+    M2= [{{markers.2.lat }}, {{markers.2.lng }}];
+    marker_crns= L.marker(crns).addTo(markerGroup);
+
+    marker_crns.bindTooltip("<b>{{ markers.0.description }}</b></br><img src='{% static 'pictures/crns.jpg' %}' width='80' height='60'>", {className:'tooltip-marker-production',permanent: true, direction: 'top', offset: [0, -10]}).openTooltip();
+    marker_crns.bindTooltip("<b style='color: green;'>{{ markers.0.production }}</b>", {className:'tooltip-marker-production',permanent: true, direction: 'right', offset: [45, -30]}).openTooltip();
+    marker_crns.bindPopup("<img src='{% static 'pictures/pv.png' %}'> </br>PV 10 kWp </br> Monoclistallin ",{closeOnClick:false});
+    marker_crns.on('click', function(e) {this.openPopup();});
+
+    marker_M1= L.marker(M1).addTo(markerGroup);
+    marker_M1.bindTooltip("<b>{{ markers.1.description }}</b></br><img src='{% static 'pictures/house1.jpg' %}' width='80' height='60'>", {className:'tooltip-marker-production',permanent: true, direction: 'bottom', offset: [0, 30]}).openTooltip();
+    marker_M1.bindTooltip("<b style='color: green;'>{{ markers.1.production }}</b></br></br><b>{{ markers.1.consumption }}</b>", {className:'tooltip-marker-production',permanent: true, direction: 'right', offset: [45, 75]}).openTooltip();
+    //marker_M1.bindTooltip("<b>{{ markers.1.consumption }}</b> ", {className:'tooltip-marker-consumption',permanent: true, direction: 'right', offset: [45, 100]}).openTooltip();
+    marker_M1.bindPopup("<img src='{% static 'pictures/pv.png' %}'> </br>PV 3.3 kWp </br> Polyclistallin ",{closeOnClick:false, autoPan: false,offset: [0, 40]});
+    marker_M1.on('click', function(e) {this.openPopup();});
+    marker_M2= L.marker(M2).addTo(markerGroup);
+    marker_M2.bindTooltip("<b>{{ markers.2.description }}</b></br><img src='{% static 'pictures/house2.jpg' %}' width='80' height='60'>", {className:'tooltip-marker-production',permanent: true, direction: 'left', offset: [-25, 0]}).openTooltip();
+    marker_M2.bindTooltip("<b>{{ markers.2.consumption }}</b>", {className:'tooltip-marker-consumption',permanent: true, direction: 'left', offset: [-125, -30]}).openTooltip();
+
+    // Get the current zoom level and center of the map when it is zoomed in
+    map.on('moveend', function() {
+        var zoom = map.getZoom();
+        var center = map.getCenter();
+        localStorage.setItem('zoom', zoom);
+        localStorage.setItem('center', JSON.stringify(center));
+    });
+    // Load the previous zoom level and center when the page is reloaded
+    window.onload = function() {
+        var zoom = localStorage.getItem('zoom');
+        var center = JSON.parse(localStorage.getItem('center'));
+        if (zoom && center) {
+            map.setView(center, zoom);
+        }
+    };
+
+    }
+
+    function updateMeasures(data){
+
+        marker_crns.setTooltipContent("<b style='color: green;'>Production: "+data.productionCRNS+" W</b>");
+        //var vv = marker_M1.getTooltip();
+        //marker_M1.setContent("kljlklm");
+        marker_M1.setTooltipContent("<b style='color: green;'>Production: "+data.productionM1+" W</b></br></br><b>Consumption: "+data.consumptionM1+" W</b>");
+        marker_M2.setTooltipContent("<b>Consumption: "+data.consumptionM2+" W</b>");
+    }
+    var compteur=1;
+
+    function executeExchange(){
+       var y="exchange"+compteur;
+       var z="";
+       if(compteur==1) z="exchange3";
+       else z="exchange"+eval(compteur-1);
+       document.getElementById(z).style.backgroundColor = 'white';
+       document.getElementById(y).style.backgroundColor = '#F09819';
+        const properties= { delay: 600, dashArray: [10, 30], weight: 5, color: "#E4A020", pulseColor: "#FFFFFF",
+                            paused: false, reverse: false, hardwareAccelerated: true}
+       const properties2= { delay: 600, dashArray: [10, 30], weight: 5, color: "#28BB57", pulseColor: "#FFFFFF",
+                            paused: true, reverse: false, hardwareAccelerated: true}
+        //delete previous paths and tooltips
+        pathGroup.eachLayer(function(layer) {layer.remove();});
+        tooltipGroup.eachLayer(function(layer) {layer.remove();});
+        polylineGroup.eachLayer(function(layer) {layer.remove();});
+        $.ajax({
+        url: "{% url 'update_exchange' %}",
+        method: "GET",
+        success: function(data) {
+        //data=data.ex1[0]
+        x="ex"+compteur;
+        var receivedDdata=data[x]
+        var tooltips=new Array(receivedDdata.length);
+        for(var i = 0; i < receivedDdata.length; i++) {
+        data=receivedDdata[i];
+        //path_crns_M1.tooltipclose();
+        var path = L.polyline.antPath([ arr[data.producer], arr[data.consumer]],properties).addTo(map);
+        path.addTo(pathGroup);
+
+        //var x="tooltip"+i;
+        var tooltipPosition=[(arr[data.producer][0]+arr[data.consumer][0])/2, (arr[data.producer][1]+arr[data.consumer][1])/2];
+        tooltips[i] = L.tooltip({permanent: true,  sticky: true, className: 'tooltip-path-begin',interactive: true}).setLatLng(tooltipPosition);
+
+        tooltips[i].setContent("<div><b>Begin delivery: "+data.beginTimeSlot+" h</b></div>").addTo(map);
+        tooltips[i].addTo(tooltipGroup);
+
+         setTimeout(function(i,data){
+         //var y="exchange"+compteur;
+         document.getElementById(y).style.backgroundColor = '#28BB57';
+         tooltips[i]._container.classList.remove("tooltip-path-begin");
+         tooltips[i]._container.classList.add("tooltip-path-end");
+         tooltips[i].setContent("<div ><b>End Delivery: "+eval(data.beginTimeSlot+1) +" h</b></div>"
+              );
+             // "<b>injected QT : "+data.injectedQt+" Wh</br>" +"Consumed QT : "+data.consumedQt+" Wh" + "</b>"
+             pathGroup.eachLayer(function(layer) {layer.remove();});
+            var polyline = L.polyline([ arr[data.producer], arr[data.consumer]], {color: 'green', weight: 5}).addTo(map);
+            polyline.on('click', function(e) {
+                    tooltips[i].setContent("<b>injected QT : "+data.injectedQt+" Wh</br>" +
+                    "Consumed QT : "+data.consumedQt+" Wh" + "</b>");
+            });
+            //var path = L.polyline.antPath([ arr[data.producer], arr[data.consumer]],properties2).addTo(map);
+            polyline.addTo(polylineGroup);
+            }.bind(this, i,data), 20000);
+
+        // zoom the map to the polyline
+        map.fitBounds(path.getBounds());
+        }//end for
+
+        //data=receivedDdata[i];
+        if (compteur<3) {compteur+=1;}
+        else {compteur=1;}
+        }
+        });
+    }
+    </script>
+
+    <script>
+    setInterval(function() {
+        $.ajax({
+        url: "{% url 'update-measures' %}",
+        method: "GET",
+        success: function(data) { updateMeasures(data); }
+        });
+    }, 60000);
+
+    /*setInterval(function() {
+        $.ajax({
+        url: "{% url 'update_exchange' %}",
+        method: "GET",
+        success: function(data) { executeExchange(data); }
+        });
+    }, 10000);*/
+
+    </script>
+<!--
+<div style="position: fixed; top: 0; left: 0; background-color: #333; width: 300px; height: 100px; display: flex; align-items: center; justify-content: center; font-size: 50px; color: cyan;">
+  <script>
+    function updateClock() {
+      var now = new Date();
+      var hours = now.getHours();
+      var minutes = now.getMinutes();
+      var seconds = now.getSeconds();
+      var timeString = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
+      document.getElementById('clock').textContent = timeString;
+    }
+    setInterval(updateClock, 1000);
+  </script>
+  <span id="clock"></span>
+</div>-->
+
+
+
+<script>
+  // Replace YOUR_API_KEY with your actual API key
+  const apiKey = 'bb8dd71ffb0b0f39f6d1b7e57cf0fd09';
+
+  // Make an API call to retrieve weather data for Sfax
+  fetch(`https://api.openweathermap.org/data/2.5/weather?q=Sfax,TN&appid=${apiKey}&units=metric`)
+    .then(response => response.json())
+    .then(data => {
+      // Extract the temperature, humidity, and weather status from the data
+      const temp = data.main.temp;
+      const humidity = data.main.humidity;
+      const weatherStatus = data.weather[0].description;
+
+      // Update the weather information in the HTML
+      const weatherInfoDiv = document.getElementById('weather-info');
+      weatherInfoDiv.innerHTML = `<table border=0 padding=10px>
+      <tr><td width=20%><img src='{% static 'pictures/humidity4.png' %}'height=20px width=25px></td><td> Temperature: </td><td>${temp} &deg;C</td></tr>
+      <tr><td><img src='{% static 'pictures/temp.png' %}'height=20px width=25px></td><td> Humidity: </td><td>${humidity}%</td></tr>
+      <tr><td><img src='{% static 'pictures/weather1.png' %}'height=20px width=25px></td><td>Weather:</td><td> ${weatherStatus}</tr></table>`;
+    })
+    .catch(error => {
+      console.error('Error fetching weather data:', error);
+      const weatherInfoDiv = document.getElementById('weather-info');
+      weatherInfoDiv.innerHTML = 'Error fetching weather data.';
+    });
+</script>
+</head>
+<!--<script>
+  setInterval(function() {
+    $.ajax({
+      url: "{% url 'map-view' %}",
+      success: function(data) {
+        $('#map').html(data);
+      }
+    });
+  }, 20000);
+</script>-->
+<!--<script src=""html.min.js" defer></script>
+<div hx-get="/map" hx-triggr="every 20s"></div>-->
+<!--<script>
+  setInterval(function() {
+    location.reload();
+  }, 20000);
+</script>-->
+<!--<head>
+  <style>
+    body {
+      background-color: white;
+    }
+  </style>
+</head>-->
+<!--<div id="plot-container" style="width: 100%; height: 400px; position: absolute; bottom: 0; display: flex; justify-content: center; align-items: center;">
+  <canvas id="plot" style="width: 80%; height: 85%; background-color: white;"></canvas>
+</div>-->
+    <body onload="map()" >
+    <section id="map" class="section-style" ></section>
+    <!--<div id="map" style="width: 100%; height: 100%;margin: 0 auto;" ></div>-->
+
+    <aside class="aside-style" >
+        <div class ="aside-div"> <h4>Weather in Sfax, Tunisia:</h4></div>
+        <div id="weather-info" class ="aside-div"> </div>
+       <div class ="aside-div">
+           <h4>3 Exchange scenarios:</h4>
+           <table border="1" id ="myTable">
+               <tr><th>Exchange</th><th>Direction</th> <th>Requested </br>Quantity</th> </tr>
+               <tr id ="exchange1"><td> 1</td><td>H1 --> H2</td> <td>60 Wh</td> </tr>
+
+               <tr id ="exchange2" ><td>2</td><td>CRNS --> H1 </br>CRNS --> H2</td>
+                   <td>500 Wh </br> 300 Wh</td> </tr>
+
+               <tr id ="exchange3"><td>3</td><td>H1 --> H2 </br>CRNS --> H2</td> <td>50 Wh</br>50 Wh</td> </tr>
+
+           </table>
+           <!--<ul>
+               <li id="li1">M1 -> M2</li>
+               <li id="li2"><table><tr><td>CRNS -> M1</td> </tr>
+                       <tr><td>Requested Quantity:5kwh</td></tr>
+                       <tr><td>CRNS -> M2</td></tr>
+                   <tr><td>Requested Quantity:5kwh</td></tr>
+                   </table>
+               </li>
+
+               <li id="li3">Exchange3: CRNS -> M2</li>
+               <li id="li4">Exchange4: CRNS -> M2</li>
+           </ul>-->
+           </br>
+           <form>
+            <input value="Start Exchange" type="button" onClick="executeExchange()" class="button-style"/>
+           </form>
+           </br></br></br>
+       </div>
+    </aside>
+    </body>
+  </html>
