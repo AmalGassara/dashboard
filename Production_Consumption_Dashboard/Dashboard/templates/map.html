@@ -1,7 +1,9 @@
 <!DOCTYPE html><!-- Include the Leaflet CSS and JS files -->
 <html xmlns="http://www.w3.org/1999/html">
+<meta name="referrer" content="origin" />
 {% load static %}
 <head>
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
    crossorigin=""/>
@@ -18,20 +20,24 @@
     var map;
     var marker_crns, marker_M1, marker_M2;
     var crns,M1, M2;
-    var arr = { "crns" : [{{markers.0.lat }}, {{markers.0.lng }}], "M1" : [{{markers.1.lat }}, {{markers.1.lng }}], "M2": [{{markers.2.lat }}, {{markers.2.lng }}] };
+    var arr = { "crns" : [{{markers.0.lat}}, {{markers.0.lng }}], "M1" : [{{markers.1.lat }}, {{markers.1.lng }}], "M2": [{{markers.2.lat }}, {{markers.2.lng }}] };
     var pathGroup = L.layerGroup();
     var polylineGroup = L.layerGroup();
     var tooltipGroup = L.layerGroup();
+    var tooltips;
     function map(){
     // Create the map
-    map = L.map('map').setView([{{ coordinates.0 }}, {{ coordinates.1 }}], 16.3);
-
+    map = L.map('map').setView([{{ 34.83556071052787 }}, {{ 10.758569818156426 }}], 16.5);
+// https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png
+    
     // Add a tile layer
-    L.tileLayer('http://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', attr='&copy; Openstreetmap France | &copy; ODbL', {
-        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
-        maxZoom: 18
+    L.tileLayer('http://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',  {
+//attr='&copy; Openstreetmap France | &copy; ODbL',        
+       attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+      //attribution: '&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/about" target="_blank">OpenStreetMap</a> contributors',
+      maxZoom: 18
+ 
     }).addTo(map);
-
     // Add Markers
     var markerGroup = L.layerGroup().addTo(map);
 
@@ -45,20 +51,21 @@
     M2= [{{markers.2.lat }}, {{markers.2.lng }}];
     marker_crns= L.marker(crns).addTo(markerGroup);
 
-    marker_crns.bindTooltip("<b>{{ markers.0.description }}</b></br><img src='{% static 'pictures/crns.jpg' %}' width='80' height='60'>", {className:'tooltip-marker-production',permanent: true, direction: 'top', offset: [0, -10]}).openTooltip();
-    marker_crns.bindTooltip("<b style='color: green;'>{{ markers.0.production }}</b>", {className:'tooltip-marker-production',permanent: true, direction: 'right', offset: [45, -30]}).openTooltip();
+    //marker_crns.bindTooltip("<b>{{ markers.0.description }}</b></br><b style='color: green;'>{{ markers.0.production }}</b>", {className:'tooltip-marker-production',permanent: true, direction: 'top', offset: [0, -10]}).openTooltip();
+    marker_crns.bindTooltip("<b style='color: white;text-decoration: underline;'>{{ markers.0.description }}</b></br><b style='color: green;'>{{ markers.0.production }}</b>", {className:'tooltip-marker-production',permanent: true, direction: 'right', offset: [0, 0]}).openTooltip();
     marker_crns.bindPopup("<img src='{% static 'pictures/pv.png' %}'> </br>PV 10 kWp </br> Monoclistallin ",{closeOnClick:false});
     marker_crns.on('click', function(e) {this.openPopup();});
 
     marker_M1= L.marker(M1).addTo(markerGroup);
-    marker_M1.bindTooltip("<b>{{ markers.1.description }}</b></br><img src='{% static 'pictures/house1.jpg' %}' width='80' height='60'>", {className:'tooltip-marker-production',permanent: true, direction: 'bottom', offset: [0, 30]}).openTooltip();
-    marker_M1.bindTooltip("<b style='color: green;'>{{ markers.1.production }}</b></br></br><b>{{ markers.1.consumption }}</b>", {className:'tooltip-marker-production',permanent: true, direction: 'right', offset: [45, 75]}).openTooltip();
+    //marker_M1.bindTooltip("<b>{{ markers.1.description }}</b>", {className:'tooltip-marker-production',permanent: true, direction: 'bottom', offset: [0, 30]}).openTooltip();
+    marker_M1.bindTooltip("<b style='color: white;text-decoration: underline;'>{{ markers.1.description }}</b></br><b style='color: green;'>{{ markers.1.production }}</b></br><b>{{ markers.1.consumption }}</b>", 
+	     {className:'tooltip-marker-production',permanent: true, direction: 'right', offset: [15, 15]}).openTooltip();
     //marker_M1.bindTooltip("<b>{{ markers.1.consumption }}</b> ", {className:'tooltip-marker-consumption',permanent: true, direction: 'right', offset: [45, 100]}).openTooltip();
     marker_M1.bindPopup("<img src='{% static 'pictures/pv.png' %}'> </br>PV 3.3 kWp </br> Polyclistallin ",{closeOnClick:false, autoPan: false,offset: [0, 40]});
     marker_M1.on('click', function(e) {this.openPopup();});
     marker_M2= L.marker(M2).addTo(markerGroup);
-    marker_M2.bindTooltip("<b>{{ markers.2.description }}</b></br><img src='{% static 'pictures/house2.jpg' %}' width='80' height='60'>", {className:'tooltip-marker-production',permanent: true, direction: 'left', offset: [-25, 0]}).openTooltip();
-    marker_M2.bindTooltip("<b>{{ markers.2.consumption }}</b>", {className:'tooltip-marker-consumption',permanent: true, direction: 'left', offset: [-125, -30]}).openTooltip();
+    marker_M2.bindTooltip("<b style='color: white;text-decoration: underline;'>{{ markers.2.description }}</b></br><b>{{ markers.2.consumption }}</b>", {className:'tooltip-marker-production',permanent: true, direction: 'bottom', offset: [0, 30]}).openTooltip();
+    //marker_M2.bindTooltip("<b>{{ markers.2.consumption }}</b>", {className:'tooltip-marker-consumption',permanent: true, direction: 'left', offset: [-125, -30]}).openTooltip();
 
     // Get the current zoom level and center of the map when it is zoomed in
     map.on('moveend', function() {
@@ -80,11 +87,11 @@
 
     function updateMeasures(data){
 
-        marker_crns.setTooltipContent("<b style='color: green;'>Production: "+data.productionCRNS+" W</b>");
+        marker_crns.setTooltipContent("<b style='color: white;text-decoration: underline;'>{{ markers.0.description }}</b></br><b style='color: green;'>Production: "+data.productionCRNS+" W</b>");
         //var vv = marker_M1.getTooltip();
         //marker_M1.setContent("kljlklm");
-        marker_M1.setTooltipContent("<b style='color: green;'>Production: "+data.productionM1+" W</b></br></br><b>Consumption: "+data.consumptionM1+" W</b>");
-        marker_M2.setTooltipContent("<b>Consumption: "+data.consumptionM2+" W</b>");
+        marker_M1.setTooltipContent("<b style='color: white;text-decoration: underline;'>{{ markers.1.description }}</b></br><b style='color: green;'>Production: "+data.productionM1+" W</b></br><b>Consumption: "+data.consumptionM1+" W</b>");
+        marker_M2.setTooltipContent("<b style='color: white;text-decoration: underline;'>{{ markers.2.description }}</b></br><b>Consumption: "+data.consumptionM2+" W</b>");
     }
     var compteur=1;
 
@@ -93,11 +100,11 @@
        var z="";
        if(compteur==1) z="exchange3";
        else z="exchange"+eval(compteur-1);
-       document.getElementById(z).style.backgroundColor = 'white';
+       document.getElementById(z).style.backgroundColor = 'black';
        document.getElementById(y).style.backgroundColor = '#F09819';
         const properties= { delay: 600, dashArray: [10, 30], weight: 5, color: "#E4A020", pulseColor: "#FFFFFF",
                             paused: false, reverse: false, hardwareAccelerated: true}
-       const properties2= { delay: 600, dashArray: [10, 30], weight: 5, color: "#28BB57", pulseColor: "#FFFFFF",
+        const properties2= { delay: 600, dashArray: [10, 30], weight: 5, color: "#28BB57", pulseColor: "#FFFFFF",
                             paused: true, reverse: false, hardwareAccelerated: true}
         //delete previous paths and tooltips
         pathGroup.eachLayer(function(layer) {layer.remove();});
@@ -110,48 +117,118 @@
         //data=data.ex1[0]
         x="ex"+compteur;
         var receivedDdata=data[x]
-        var tooltips=new Array(receivedDdata.length);
+        tooltips=new Array(receivedDdata.length);
         for(var i = 0; i < receivedDdata.length; i++) {
         data=receivedDdata[i];
         //path_crns_M1.tooltipclose();
         var path = L.polyline.antPath([ arr[data.producer], arr[data.consumer]],properties).addTo(map);
         path.addTo(pathGroup);
 
-        //var x="tooltip"+i;
+        
         var tooltipPosition=[(arr[data.producer][0]+arr[data.consumer][0])/2, (arr[data.producer][1]+arr[data.consumer][1])/2];
         tooltips[i] = L.tooltip({permanent: true,  sticky: true, className: 'tooltip-path-begin',interactive: true}).setLatLng(tooltipPosition);
-
         tooltips[i].setContent("<div><b>Begin delivery: "+data.beginTimeSlot+" h</b></div>").addTo(map);
         tooltips[i].addTo(tooltipGroup);
-
+         /*
          setTimeout(function(i,data){
-         //var y="exchange"+compteur;
          document.getElementById(y).style.backgroundColor = '#28BB57';
          tooltips[i]._container.classList.remove("tooltip-path-begin");
          tooltips[i]._container.classList.add("tooltip-path-end");
-         tooltips[i].setContent("<div ><b>End Delivery: "+eval(data.beginTimeSlot+1) +" h</b></div>"
-              );
-             // "<b>injected QT : "+data.injectedQt+" Wh</br>" +"Consumed QT : "+data.consumedQt+" Wh" + "</b>"
+         tooltips[i].setContent("<div ><b>End Delivery: "+eval(data.beginTimeSlot+1) +" h</b></div>");
              pathGroup.eachLayer(function(layer) {layer.remove();});
             var polyline = L.polyline([ arr[data.producer], arr[data.consumer]], {color: 'green', weight: 5}).addTo(map);
             polyline.on('click', function(e) {
                     tooltips[i].setContent("<b>injected QT : "+data.injectedQt+" Wh</br>" +
                     "Consumed QT : "+data.consumedQt+" Wh" + "</b>");
             });
-            //var path = L.polyline.antPath([ arr[data.producer], arr[data.consumer]],properties2).addTo(map);
             polyline.addTo(polylineGroup);
-            }.bind(this, i,data), 20000);
+            }.bind(this, i,data), 20000);*/
 
         // zoom the map to the polyline
-        map.fitBounds(path.getBounds());
+        //map.fitBounds(path.getBounds());
         }//end for
 
         //data=receivedDdata[i];
-        if (compteur<3) {compteur+=1;}
-        else {compteur=1;}
+		//charger left aside avec les graphes
+		if(compteur==1){
+		document.getElementById("left-aside-h1").textContent = "House1: Energy Balance prediction";
+		document.getElementById("left-aside-img1").src = "{% static 'pictures/sc1_prod.png' %}";
+		document.getElementById("left-aside-img1").style.height = "170px";
+		document.getElementById("left-aside-h2").textContent = "House 2: Consumption prediction";
+		document.getElementById("left-aside-img2").src = "{% static 'pictures/sc1_cons.png' %}";
+		document.getElementById("left-aside-img1").style.height = "170px";
+		document.getElementById("left-aside-h3").textContent = "Exchange Contracts";
+		document.getElementById("left-aside-img3").src = "{% static 'pictures/sc1.png' %}";
+		document.getElementById("left-aside-img3").style.height = "200px";
+		}
+		else if(compteur==2){
+		document.getElementById("left-aside-h1").textContent = "CRNS: Energy Balance prediction";
+		document.getElementById("left-aside-img1").src = "{% static 'pictures/sc2_prod.png' %}";
+		document.getElementById("left-aside-h2").textContent = "House1: Energy Balance prediction";
+		document.getElementById("left-aside-img1").style.height = "160px";
+		document.getElementById("left-aside-img2").src = "{% static 'pictures/sc2_cons1.png' %}";
+		document.getElementById("left-aside-img2").style.height = "180px";
+		document.getElementById("left-aside-h3").textContent = "House 2: Consumption prediction";
+		document.getElementById("left-aside-img3").src = "{% static 'pictures/sc2_cons2.png' %}";}
+		else{
+		document.getElementById("left-aside-h1").textContent = "CRNS: Energy Balance prediction";
+		document.getElementById("left-aside-img1").src = "{% static 'pictures/sc3_prod1.png' %}";
+		document.getElementById("left-aside-img1").style.height = "160px";
+		document.getElementById("left-aside-h2").textContent = "House1: Energy Balance prediction";
+		document.getElementById("left-aside-img2").src = "{% static 'pictures/sc3_prod2.png' %}";
+		document.getElementById("left-aside-img2").style.height = "180px";
+		document.getElementById("left-aside-h3").textContent = "House 2: Consumption prediction";
+		document.getElementById("left-aside-img3").src = "{% static 'pictures/sc3_cons.png' %}";}
+        /*if (compteur<3) {compteur+=1;}
+        else {compteur=1;}*/
         }
         });
     }
+
+     /////////////////////////////////////////////////
+     function stopExchange(){
+	   var y="exchange"+compteur;
+       var z="";
+       if(compteur==1) z="exchange3";
+       else z="exchange"+eval(compteur-1);
+        $.ajax({
+        url: "{% url 'update_exchange' %}",
+        method: "GET",
+        success: function(data) {
+        //data=data.ex1[0]
+        x="ex"+compteur;
+        var receivedDdata=data[x]
+        for(var i = 0; i < receivedDdata.length; i++) {
+        data=receivedDdata[i];
+        
+         document.getElementById(y).style.backgroundColor = "green";//'#28BB57';
+         tooltips[i]._container.classList.remove("tooltip-path-begin");
+         tooltips[i]._container.classList.add("tooltip-path-end");
+         tooltips[i].setContent("<div ><b><u>End Delivery: "+eval(data.beginTimeSlot+1) +" h</b></u></br>"+
+		 "<b>injected QT : "+data.injectedQt+" Wh</br>" +
+                    "Consumed QT : "+data.consumedQt+" Wh" + "</b></div>");
+         pathGroup.eachLayer(function(layer) {layer.remove();});
+         var polyline = L.polyline([ arr[data.producer], arr[data.consumer]], {color: 'green', weight: 5}).addTo(map);
+         polyline.on('click', function(e) {
+	            console.log (i);
+                    tooltips[i].setContent("<b>injected QT : "+data.injectedQt+" Wh</br>" +
+                    "Consumed QT : "+data.consumedQt+" Wh" + "</b>");
+            });
+         polyline.addTo(polylineGroup);
+
+        // zoom the map to the polyline
+        //map.fitBounds(path.getBounds());
+        }//end for
+
+        //data=receivedDdata[i];
+		
+		if (compteur<3) {compteur+=1;}
+        else {compteur=1;}
+        }
+        });
+	
+}
+     //////////////////////////////////////////////
     </script>
 
     <script>
@@ -205,10 +282,10 @@
 
       // Update the weather information in the HTML
       const weatherInfoDiv = document.getElementById('weather-info');
-      weatherInfoDiv.innerHTML = `<table border=0 padding=10px>
-      <tr><td width=20%><img src='{% static 'pictures/humidity4.png' %}'height=20px width=25px></td><td> Temperature: </td><td>${temp} &deg;C</td></tr>
-      <tr><td><img src='{% static 'pictures/temp.png' %}'height=20px width=25px></td><td> Humidity: </td><td>${humidity}%</td></tr>
-      <tr><td><img src='{% static 'pictures/weather1.png' %}'height=20px width=25px></td><td>Weather:</td><td> ${weatherStatus}</tr></table>`;
+      weatherInfoDiv.innerHTML = `<table border=0 padding=10px background-color="black">
+      <tr><td width=20%><img src='{% static 'pictures/temp3.jpg' %}'height=30px width=30px background-color="white"></td><td> Temperature: </td><td>${temp} &deg;C</td></tr>
+      <tr><td><img src='{% static 'pictures/humidity1.jpg' %}'height=25px width=25px></td><td> Humidity: </td><td>${humidity}%</td></tr>
+      <tr><td><img src='{% static 'pictures/weather.jpg' %}'height=30px width=30px></td><td>Weather:</td><td> ${weatherStatus}</tr></table>`;
     })
     .catch(error => {
       console.error('Error fetching weather data:', error);
@@ -227,20 +304,7 @@
     });
   }, 20000);
 </script>-->
-<!--<script src=""html.min.js" defer></script>
-<div hx-get="/map" hx-triggr="every 20s"></div>-->
-<!--<script>
-  setInterval(function() {
-    location.reload();
-  }, 20000);
-</script>-->
-<!--<head>
-  <style>
-    body {
-      background-color: white;
-    }
-  </style>
-</head>-->
+
 <!--<div id="plot-container" style="width: 100%; height: 400px; position: absolute; bottom: 0; display: flex; justify-content: center; align-items: center;">
   <canvas id="plot" style="width: 80%; height: 85%; background-color: white;"></canvas>
 </div>-->
@@ -248,19 +312,21 @@
     <section id="map" class="section-style" ></section>
     <!--<div id="map" style="width: 100%; height: 100%;margin: 0 auto;" ></div>-->
 
-    <aside class="aside-style" >
+    <aside class="right-aside-style" >
         <div class ="aside-div"> <h4>Weather in Sfax, Tunisia:</h4></div>
-        <div id="weather-info" class ="aside-div"> </div>
+        <div id="weather-info" class ="aside-div" background-color="black"> </div>
        <div class ="aside-div">
-           <h4>3 Exchange scenarios:</h4>
+	       
+           <h4>Exchange scenarios:</h4>
+		   <center>
            <table border="1" id ="myTable">
-               <tr><th>Exchange</th><th>Direction</th> <th>Requested </br>Quantity</th> </tr>
-               <tr id ="exchange1"><td> 1</td><td>H1 --> H2</td> <td>60 Wh</td> </tr>
+               <tr><th>Exchange</th><th>Direction</th>  </tr>
+               <tr id ="exchange1"><td> 1</td><td>House1 --> House2</td>  </tr>
 
-               <tr id ="exchange2" ><td>2</td><td>CRNS --> H1 </br>CRNS --> H2</td>
-                   <td>500 Wh </br> 300 Wh</td> </tr>
+               <tr id ="exchange2" ><td>2</td><td>CRNS --> House1 </br>CRNS --> House2</td>
+                   </tr>
 
-               <tr id ="exchange3"><td>3</td><td>H1 --> H2 </br>CRNS --> H2</td> <td>50 Wh</br>50 Wh</td> </tr>
+               <tr id ="exchange3"><td>3</td><td>House1 --> House2 </br>CRNS --> House2</td> </tr>
 
            </table>
            <!--<ul>
@@ -276,11 +342,25 @@
                <li id="li4">Exchange4: CRNS -> M2</li>
            </ul>-->
            </br>
-           <form>
+		   
+        
             <input value="Start Exchange" type="button" onClick="executeExchange()" class="button-style"/>
-           </form>
+            <input value="Stop Exchange" type="button" onClick="stopExchange()" class="button-style"/>
+      
+		   </center>
            </br></br></br>
        </div>
     </aside>
+	    <aside class="left-aside-style" >
+		<div class ="aside-div">
+		<h5 id="left-aside-h1"> House1: Energy Balance prediction</h3>
+		<img id="left-aside-img1" src="{% static 'pictures/sc1_prod.png' %}" width="100%" height="170px">
+		<h5 id="left-aside-h2"> House 2: Consumption prediction</h3>
+		<img id="left-aside-img2" src="{% static 'pictures/sc1_cons.png' %}" width="100%" height="170px" >
+		
+		<h5 id="left-aside-h3"> Exchange Contracts</h3>
+		<img id="left-aside-img3" src="{% static 'pictures/sc1.png' %}" width="100%" height="200px">
+		</div>
+		</aside>
     </body>
   </html>

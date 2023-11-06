@@ -1,5 +1,16 @@
 /*Sometimes all it takes is just "Ctrl + F5"*/
-
+h5{
+	margin: 0.1px;
+}
+.leaflet-layer,
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out,
+.leaflet-control-attribution {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+body{
+	background-color: rgb(65, 65, 65);
+}
 .leaflet-popup-content {
     background-color: #fff;
     padding: 10px;
@@ -16,27 +27,35 @@
     color: #333;
 
 }
-.aside-style{
-    width: 26%;
-    position: fixed;
-    top: 0; right: 0;
-}
+
 .aside-div{
 
-    background-color: #F9F6F6;
+    background-color=black;
     font-size: 20px;
     border: 3px #B3B0B0 solid; border-radius: 5px;
     margin: 5px;
     padding: 5px;
 }
 .section-style{
-    width: 73%;
+    width: 49%;
     position: fixed;
-    height: 100%; top: 0; left: 0;
+    height: 100%; top: 0; left: 340px;
     border: 3px #B3B0B0 solid;border-radius: 5px;
     margin: 5px;
 }
-
+.right-aside-style{
+    width: 25%;
+    position: fixed;
+    top: 0; right: 0;
+    color: white;
+    background-color: black; /* rgb(65, 65, 65);*/
+}
+.left-aside-style{
+    width: 25%;
+    position: fixed;
+    top: 0; left: 0;
+   color: white;
+}
 .button-style {
   margin: 10px;
   padding: 15px 30px;
@@ -49,6 +68,7 @@
   display: block;
   border: 0px;
   font-weight: 700;
+  width: 200px;
   box-shadow: 0px 0px 14px -7px #f09819;
   background-image: linear-gradient(45deg, #FF512F 0%, #F09819  51%, #FF512F  100%);
   cursor: pointer;
